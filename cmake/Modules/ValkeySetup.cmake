@@ -252,12 +252,14 @@ if (VALKEY_DEBUG_BUILD)
 endif ()
 
 # Check for Atomic
+if(NOT WIN32)
 check_include_files(stdatomic.h HAVE_C11_ATOMIC)
 if (HAVE_C11_ATOMIC)
     add_valkey_server_compiler_options("-std=gnu11")
 else ()
     add_valkey_server_compiler_options("-std=c99")
 endif ()
+endif(NOT WIN32)
 
 # Sanitizer
 if (BUILD_SANITIZER)
@@ -291,8 +293,10 @@ if (USE_JEMALLOC)
     include_directories("${CMAKE_SOURCE_DIR}/deps/jemalloc/include")
 endif ()
 
+if(NOT WIN32)
 # Common compiler flags
 add_valkey_server_compiler_options("-pedantic")
+endif(NOT WIN32)
 
 if (NOT BUILD_LUA)
     message(STATUS "Lua scripting engine is disabled")

@@ -29,7 +29,7 @@
  */
 
 #include "fmacros.h"
-
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
@@ -46,7 +46,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <grp.h>
-
+#include <sys/stat.h>
 #include "anet.h"
 #include "config.h"
 #include "util.h"
@@ -62,7 +62,7 @@ static void anetSetError(char *err, const char *fmt, ...) {
 }
 
 int anetGetError(int fd) {
-    int sockerr = 0;
+    char sockerr = 0;
     socklen_t errlen = sizeof(sockerr);
 
     if (getsockopt(fd, SOL_SOCKET, SO_ERROR, &sockerr, &errlen) == -1) sockerr = errno;
@@ -151,15 +151,15 @@ int anetCloexec(int fd) {
 /* Enable TCP keep-alive mechanism to detect dead peers,
  * TCP_KEEPIDLE, TCP_KEEPINTVL and TCP_KEEPCNT will be set accordingly. */
 int anetKeepAlive(char *err, int fd, int interval) {
-    int enabled = 1;
+    char enabled = 1;
     if (setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &enabled, sizeof(enabled))) {
         anetSetError(err, "setsockopt SO_KEEPALIVE: %s", strerror(errno));
         return ANET_ERR;
     }
 
-    int idle;
-    int intvl;
-    int cnt;
+    char idle;
+    char intvl;
+    char cnt;
 
     /* There are platforms that are expected to support the full mechanism of TCP keep-alive,
      * we want the compiler to emit warnings of unused variables if the preprocessor directives
@@ -290,7 +290,7 @@ int anetKeepAlive(char *err, int fd, int interval) {
     return ANET_OK;
 }
 
-static int anetSetTcpNoDelay(char *err, int fd, int val) {
+static int anetSetTcpNoDelay(char *err, int fd, char val) {
     if (setsockopt(fd, IPPROTO_TCP, TCP_NODELAY, &val, sizeof(val)) == -1) {
         anetSetError(err, "setsockopt TCP_NODELAY: %s", strerror(errno));
         return ANET_ERR;
@@ -313,7 +313,7 @@ int anetSendTimeout(char *err, int fd, long long ms) {
 
     tv.tv_sec = ms / 1000;
     tv.tv_usec = (ms % 1000) * 1000;
-    if (setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv)) == -1) {
+    if (setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, (const char*) &tv, sizeof(tv)) == -1) {
         anetSetError(err, "setsockopt SO_SNDTIMEO: %s", strerror(errno));
         return ANET_ERR;
     }
@@ -327,7 +327,7 @@ int anetRecvTimeout(char *err, int fd, long long ms) {
 
     tv.tv_sec = ms / 1000;
     tv.tv_usec = (ms % 1000) * 1000;
-    if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) == -1) {
+    if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (const char*) &tv, sizeof(tv)) == -1) {
         anetSetError(err, "setsockopt SO_RCVTIMEO: %s", strerror(errno));
         return ANET_ERR;
     }
@@ -381,7 +381,7 @@ int anetResolve(char *err, char *host, char *ipbuf, size_t ipbuf_len, int flags)
 }
 
 static int anetSetReuseAddr(char *err, int fd) {
-    int yes = 1;
+    char yes = 1;
     /* Make sure connection-intensive things like the benchmark tool
      * will be able to close/open sockets a zillion of times */
     if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) == -1) {
@@ -583,7 +583,7 @@ static int anetListen(char *err, int s, struct sockaddr *sa, socklen_t len, int 
 }
 
 static int anetV6Only(char *err, int s) {
-    int yes = 1;
+    char yes = 1;
     if (setsockopt(s, IPPROTO_IPV6, IPV6_V6ONLY, &yes, sizeof(yes)) == -1) {
         anetSetError(err, "setsockopt: %s", strerror(errno));
         return ANET_ERR;

@@ -42,9 +42,10 @@ if(UNISTD)
 		link_directories(${UNISTD_LINK_DIRECTORIES})
 		link_libraries(libunistd Ws2_32 Imm32)
         # fix-up for broknen MSVC C11 stdatomic.h:
-        include_directories(BEFORE ${LIBUNISTD_PATH}/unistd/atomic)
+        include_directories(BEFORE ${LIBUNISTD_PATH}/unistd)
         # fix-up for _FILE_OFFSET_BITS=64 controls whether off_t is 32?bit or 64?bit
         add_definitions(-Doff_t=__int64)
+        add_definitions(-D_CRT_DECLARE_NONSTDC_NAMES=0)
 	endif(WIN32)
 endif(UNISTD)
 

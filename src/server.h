@@ -90,7 +90,9 @@
  * which will lead to ODR/LTO type mismatches. Fail fast at compile time.
  */
 #include <sys/types.h>
+#ifndef _WIN32
 static_assert(sizeof(off_t) >= 8, "off_t must be 64-bit; ensure _FILE_OFFSET_BITS=64 is in effect before system headers");
+#endif
 
 #ifdef USE_LTTNG
 #define valkey_fork() do_fork()

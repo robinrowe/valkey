@@ -839,6 +839,9 @@ void linenoiseEditDeletePrevWord(struct linenoiseState *l) {
  * when ctrl+d is typed.
  *
  * The function returns the length of the current buffer. */
+
+#define seqBufferMaxLength 8
+                    
 static int linenoiseEdit(int stdin_fd, int stdout_fd, char *buf, size_t buflen, const char *prompt)
 {
     struct linenoiseState l;
@@ -964,7 +967,7 @@ static int linenoiseEdit(int stdin_fd, int stdout_fd, char *buf, size_t buflen, 
                 if (seq[1] >= '0' && seq[1] <= '9') {
                     /* Extended escape, read additional bytes.
                      * Examples: ESC [1;5C  ESC [3~ */
-                    const int seqBufferMaxLength = 8;
+                    //const int seqBufferMaxLength = 8;
                     char seqBuffer[seqBufferMaxLength];
                     int i = 0;
                     seqBuffer[i++] = seq[1];

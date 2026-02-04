@@ -19,7 +19,11 @@ function (valkey_get_distro_name DISTRO_NAME)
         set(${DISTRO_NAME}
             "freebsd"
             PARENT_SCOPE)
-    else ()
+    elseif (WIN32)
+        set(${DISTRO_NAME}
+            "windows"
+            PARENT_SCOPE)
+	else ()
         set(${DISTRO_NAME}
             "unknown"
             PARENT_SCOPE)

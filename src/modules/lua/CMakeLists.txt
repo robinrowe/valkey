@@ -1,10 +1,12 @@
 project(valkeylua)
 
+if(NOT WIN32)
 if (VALKEY_DEBUG_BUILD)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -W -Wall -fno-common -g -ggdb -std=c99 -O2 -D_GNU_SOURCE")
 else ()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -W -Wall -fno-common -O3 -std=c99  -D_GNU_SOURCE")
 endif()
+endif(NOT WIN32)
 
 set(LUA_ENGINE_SRCS
     engine_lua.c

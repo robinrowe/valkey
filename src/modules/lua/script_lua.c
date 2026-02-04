@@ -44,6 +44,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <time.h>
+#include <unistd.h>
 
 #define LUA_CMD_OBJCACHE_SIZE 32
 #define LUA_CMD_OBJCACHE_MAX_LEN 64

@@ -48,6 +48,7 @@
 #include <time.h>
 #include <lauxlib.h>
 #include <lualib.h>
+#include <unistd.h>
 
 #define REGISTRY_LOAD_CTX_NAME "__LIBRARY_CTX__"
 #define LIBRARY_API_NAME "__LIBRARY_API__"

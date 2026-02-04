@@ -39,6 +39,11 @@ extern const char *SDS_NOINIT;
 #include <stdarg.h>
 #include <stdint.h>
 #include <limits.h>
+#include <unistd.h>
+
+#ifdef _WIN32
+#define __attribute__(x)
+#endif
 
 /* Constness:
  *

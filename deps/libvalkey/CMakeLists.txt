@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.7.0)
+cmake_minimum_required(VERSION 3.10.0)
 
 macro(getDefinedVersion name)
   set(VERSION_REGEX "^#define LIBVALKEY_${name} (.+)$")
@@ -187,7 +187,7 @@ IF(ENABLE_TLS)
             $<BUILD_INTERFACE:${SDS_INCLUDE_DIR}>
     )
 
-    IF (APPLE AND BUILD_SHARED_LIBS)
+    IF (APPLE AND BUILD_SHARED_LIBS AND NOT WIN32)
         SET_PROPERTY(TARGET valkey_tls PROPERTY LINK_FLAGS "-Wl,-undefined -Wl,dynamic_lookup")
     ENDIF()
 

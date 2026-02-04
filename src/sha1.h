@@ -7,6 +7,10 @@ By Steve Reid <steve@edmweb.com>
 100% Public Domain
 */
 
+#ifdef _WIN32
+#define __attribute__(x)
+#endif
+
 typedef struct {
     uint32_t state[5];
     uint32_t count[2];

@@ -26,6 +26,8 @@
 ** [ MIT license: http://www.opensource.org/licenses/mit-license.php ]
 */
 
+#include <stdint.h>
+
 #define LUA_BITOP_VERSION	"1.0.2"
 
 #define LUA_LIB

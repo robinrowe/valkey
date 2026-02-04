@@ -20,11 +20,34 @@ option(BUILD_EXAMPLE_MODULES "Build example modules" OFF)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 project("valkey")
-add_compile_options(-Wundef)
+
+if(WIN32)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS -DWIN32_LEAN_AND_MEAN -DUNISTD_KEEP_CLOSE)
+else(WIN32)
+    add_compile_options(-Wundef)
+endif(WIN32)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS ON)
+
+option(UNISTD "Enable libunistd" true)
+if(UNISTD)
+	if(WIN32)
+#		message("CMAKE_GENERATOR_PLATFORM = ${CMAKE_GENERATOR_PLATFORM}")
+		set(LIBUNISTD_PATH /code/github/libunistd)
+		include_directories(${LIBUNISTD_PATH}/unistd)
+		set (UNISTD_LINK_DIRECTORIES ${LIBUNISTD_PATH}/build/${CMAKE_GENERATOR_PLATFORM}/Release)
+		message(libunistd = ${UNISTD_LINK_DIRECTORIES}/libunistd.lib)
+		link_directories(${UNISTD_LINK_DIRECTORIES})
+		link_libraries(libunistd Ws2_32 Imm32)
+        # fix-up for broknen MSVC C11 stdatomic.h:
+        include_directories(BEFORE ${LIBUNISTD_PATH}/unistd/atomic)
+        # fix-up for _FILE_OFFSET_BITS=64 controls whether off_t is 32?bit or 64?bit
+        add_definitions(-Doff_t=__int64)
+	endif(WIN32)
+endif(UNISTD)
+
 
 include(ValkeySetup)
 add_subdirectory(src)

@@ -216,7 +216,7 @@ void setproctitle(const char *fmt, ...);
 #include <sys/types.h> /* This will likely define BYTE_ORDER */
 
 #ifndef BYTE_ORDER
-#if (BSD >= 199103)
+#if (BSD >= 199103) && !defined(_WIN32)
 #include <machine/endian.h>
 #else
 #if defined(linux) || defined(__linux__)
@@ -228,7 +228,7 @@ void setproctitle(const char *fmt, ...);
 
 #if defined(__i386__) || defined(__x86_64__) || defined(__amd64__) || defined(vax) || defined(ns32000) ||         \
     defined(sun386) || defined(MIPSEL) || defined(_MIPSEL) || defined(BIT_ZERO_ON_RIGHT) || defined(__alpha__) || \
-    defined(__alpha)
+    defined(__alpha) || defined(_WIN32) 
 #define BYTE_ORDER LITTLE_ENDIAN
 #endif
 
@@ -375,10 +375,79 @@ void setcpuaffinity(const char *cpulist);
 #endif
 
 /* Check if we can compile x86 SIMD code */
+#if 0
 #if defined(__x86_64__) && ((defined(__GNUC__) && __GNUC__ >= 5) || (defined(__clang__) && __clang_major__ >= 4)) && defined(__has_attribute) && __has_attribute(target)
 #define HAVE_X86_SIMD 1
 #else
 #define HAVE_X86_SIMD 0
+#endif
+#endif
+
+// simd_detect.h — portable SIMD feature detection for C/C++
+// Works on GCC, Clang, MSVC, ICC, MinGW, Clang-CL
+
+#pragma once
+
+// =========================
+//  SSE2
+// =========================
+#if defined(__SSE2__) || defined(_M_X64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
+#   define HAVE_SSE2 1
+#else
+#   define HAVE_SSE2 0
+#endif
+
+// =========================
+//  SSE4.1
+// =========================
+#if defined(__SSE4_1__) || defined(__AVX__) || defined(__AVX2__)
+#   define HAVE_SSE41 1
+#else
+#   define HAVE_SSE41 0
+#endif
+
+// =========================
+//  AVX
+// =========================
+#if defined(__AVX__) || defined(__AVX2__)
+#   define HAVE_AVX 1
+#else
+#   define HAVE_AVX 0
+#endif
+
+// =========================
+//  AVX2
+// =========================
+#if defined(__AVX2__)
+#   define HAVE_AVX2 1
+#else
+#   define HAVE_AVX2 0
+#endif
+
+// =========================
+//  AVX-512 (basic)
+// =========================
+#if defined(__AVX512F__)
+#   define HAVE_AVX512 1
+#else
+#   define HAVE_AVX512 0
+#endif
+
+#if HAVE_AVX2
+#   define POSIX_SIMD_LEVEL 5
+#elif HAVE_AVX
+#   define POSIX_SIMD_LEVEL 4
+#elif HAVE_SSE41
+#   define POSIX_SIMD_LEVEL 3
+#elif HAVE_SSE2
+#   define POSIX_SIMD_LEVEL 2
+#else
+#   define POSIX_SIMD_LEVEL 0
+#endif
+#if POSIX_SIMD_LEVEL >= 2 && !defined(_WIN32)
+#   define HAVE_X86_SIMD 1
+#else
+#   define HAVE_X86_SIMD 0
 #endif
 
 #if HAVE_X86_SIMD
